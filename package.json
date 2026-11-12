@@ -1,0 +1,49 @@
+{
+  "name": "n8n-nodes-finn",
+  "version": "0.1.0",
+  "description": "n8n community nodes for finn (hirefinn.ai): contacts, notes, Operator agents and instant webhook triggers through Finn's public API v1.",
+  "keywords": [
+    "n8n-community-node-package",
+    "finn",
+    "hirefinn",
+    "crm",
+    "ai-employees"
+  ],
+  "license": "MIT",
+  "homepage": "https://hirefinn.ai",
+  "author": {
+    "name": "finn",
+    "email": "support@hirefinn.ai"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && node scripts/copy-icons.js",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/FinnApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Finn/Finn.node.js",
+      "dist/nodes/FinnTrigger/FinnTrigger.node.js"
+    ]
+  },
+  "engines": {
+    "node": ">=20.15"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "n8n-workflow": "^2.16.0",
+    "typescript": "^5.6.0"
+  }
+}
