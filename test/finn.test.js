@@ -83,6 +83,25 @@ test('create or update: 409 with nothing to patch reads the existing contact', a
 	done(ctx);
 });
 
+test('create or update: 409 finds the id in the v1 error fields', async () => {
+	const ctx = fakeContext({
+		params: { resource: 'contact', operation: 'createOrUpdate', phone: '+91981', additionalFields: {} },
+		routes: [
+			{
+				method: 'POST',
+				path: '/contacts',
+				status: 409,
+				body: { error: { code: 'contact_exists', message: 'x', fields: [{ field: 'contact_id', code: 'context', message: 'c9', value: 'c9' }] } },
+			},
+			{ method: 'GET', path: '/contacts/c9', body: { contact: contact({ id: 'c9' }) } },
+		],
+	});
+	const [[item]] = await run(ctx);
+	assert.equal(item.json.id, 'c9');
+	assert.equal(item.json.created, false);
+	done(ctx);
+});
+
 test('create or update: another 409 is an error', async () => {
 	const ctx = fakeContext({
 		params: { resource: 'contact', operation: 'createOrUpdate', phone: '+91981', additionalFields: {} },
