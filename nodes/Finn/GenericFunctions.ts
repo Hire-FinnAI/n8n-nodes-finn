@@ -35,7 +35,7 @@ export const errorOf = (statusCode: number, raw: unknown): { code: string; messa
 	if (typeof body === 'string') {
 		try {
 			body = JSON.parse(body) as IDataObject;
-		} catch (e) {
+		} catch {
 			body = {};
 		}
 	}
