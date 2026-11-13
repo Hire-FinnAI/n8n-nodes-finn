@@ -185,7 +185,12 @@ async function createOrUpdate(this: IExecuteFunctions, i: number): Promise<IData
 	if (create.statusCode === 409) {
 		const { code, message } = errorOf(409, create.body);
 		const err = create.body.error as IDataObject | undefined;
-		const existing = create.body.contact_id || (err && typeof err === 'object' ? err.contact_id : undefined);
+		// Finn's v1 errors carry extra context in error.fields ({ field: 'contact_id', value }); older bodies had it flat.
+		const extras = err && typeof err === 'object' && Array.isArray(err.fields) ? (err.fields as IDataObject[]) : [];
+		const existing =
+			create.body.contact_id ||
+			(err && typeof err === 'object' ? err.contact_id : undefined) ||
+			extras.find((f) => f && f.field === 'contact_id')?.value;
 		if (code !== 'contact_exists' || !existing) {
 			throw new NodeOperationError(this.getNode(), message, { itemIndex: i });
 		}
