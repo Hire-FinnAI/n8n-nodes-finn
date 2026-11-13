@@ -2,16 +2,23 @@ import type {
 	IDataObject,
 	IExecuteFunctions,
 	ILoadOptionsFunctions,
+	INode,
 	INodeExecutionData,
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { contactFields, contactOperations } from './ContactDescription';
 import { agentFields, agentOperations, noteFields, noteOperations } from './NoteAgentDescription';
 import { errorOf, finnRequest, flatContact, keyValues, tagList } from './GenericFunctions';
+
+// Keeps Finn's API errors (with their HTTP context) as they are; anything else becomes a NodeOperationError.
+const nodeError = (node: INode, error: unknown, itemIndex: number) =>
+	error instanceof NodeApiError || error instanceof NodeOperationError
+		? error
+		: new NodeOperationError(node, error as Error, { itemIndex });
 
 const present = (v: unknown) => v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length === 0);
 
@@ -104,7 +111,7 @@ export class Finn implements INodeType {
 					out.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
 					continue;
 				}
-				throw error;
+				throw nodeError(this.getNode(), error, i);
 			}
 		}
 		return [out];
@@ -202,8 +209,9 @@ async function createOrUpdate(this: IExecuteFunctions, i: number): Promise<IData
 		contactId = String(contact && contact.id);
 		created = true;
 		// Create takes only phone, name, kind and custom fields; the rest is set right after.
-		const { name, custom_fields: cf, ...rest } = all;
-		patch = rest;
+		patch = { ...all };
+		delete patch.name;
+		delete patch.custom_fields;
 	}
 
 	if (Object.keys(patch).length || !contact) {
