@@ -1,0 +1,17 @@
+# Publishes to npm on a version tag (e.g. 0.1.2) through npm trusted publishing, which signs provenance.
+# npm only accepts OIDC tokens from GitLab.com shared runners, so this job must not run on a self-hosted runner.
+publish:
+  image: node:24
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  id_tokens:
+    NPM_ID_TOKEN:
+      aud: "npm:registry.npmjs.org"
+    SIGSTORE_ID_TOKEN:
+      aud: sigstore
+  script:
+    - npm install -g npm@11
+    - node -e "if (require('./package.json').version !== process.env.CI_COMMIT_TAG) { console.error('tag does not match package.json version'); process.exit(1) }"
+    - npm ci
+    - npm run lint
+    - npm publish --access public

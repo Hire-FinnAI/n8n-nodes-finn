@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-finn",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "n8n community nodes for finn (hirefinn.ai): contacts, notes, Operator agents and instant webhook triggers through Finn's public API v1.",
   "keywords": [
     "n8n-community-node-package",
@@ -13,10 +13,10 @@
   "homepage": "https://hirefinn.ai",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hire-FinnAI/n8n-nodes-finn.git"
+    "url": "git+https://gitlab.com/dev3935/n8n-nodes-finn.git"
   },
   "bugs": {
-    "url": "https://github.com/Hire-FinnAI/n8n-nodes-finn/issues"
+    "url": "https://gitlab.com/dev3935/n8n-nodes-finn/-/issues"
   },
   "author": {
     "name": "finn",
